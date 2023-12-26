@@ -19,8 +19,8 @@ use std::io::Error;
 /// Note that this function does not follow symlinks, and that it is the
 /// caller's responsibility to ensure that `fd` refers to a regular file.
 /// (Failing to check this will result in a return value of EACCES).
-pub fn mincore_wrapper<Fd: AsFd>(fd: &Fd) -> RustixResult<Vec<bool>> {
-    let file_stat = fstat(fd)?;
+pub fn mincore_wrapper<Fd: AsFd>(fd: Fd) -> RustixResult<Vec<bool>> {
+    let file_stat = fstat(&fd)?;
     // Micro-optimization: check if regular file first before calling mmap
     // If it is not a regular file, return the same errno that mmap would
     if FileType::from_raw_mode(file_stat.st_mode) != FileType::RegularFile {
