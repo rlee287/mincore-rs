@@ -1,6 +1,6 @@
 //! A library providing a safe wrapper around the [`mincore`](https://www.man7.org/linux/man-pages/man2/mincore.2.html) system call. This library also re-exports `rustix::param::page_size` for convenience in interpreting the returned result.
 
-#![doc(html_root_url = "https://docs.rs/mincore-rs/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/mincore/0.1.1")]
 
 use rustix::fs::{fstat, FileType};
 use rustix::mm::{mmap, ProtFlags, MapFlags, munmap};
