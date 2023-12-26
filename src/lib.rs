@@ -1,4 +1,7 @@
 //! A library providing a safe wrapper around the `mincore` system call.
+
+#![doc(html_root_url = "https://docs.rs/mincore-rs/0.1.0")]
+
 use rustix::fs::{fstat, FileType};
 use rustix::mm::{mmap, ProtFlags, MapFlags, munmap};
 use rustix::io::{Result as RustixResult, Errno};
