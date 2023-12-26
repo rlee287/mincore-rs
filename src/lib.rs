@@ -1,5 +1,5 @@
 //! A library providing a safe wrapper around the `mincore` system call.
-use rustix::fs::fstat;
+use rustix::fs::{fstat, FileType};
 use rustix::mm::{mmap, ProtFlags, MapFlags, munmap};
 use rustix::io::{Result as RustixResult, Errno};
 use rustix::param::page_size;
@@ -11,8 +11,18 @@ use std::io::Error;
 
 /// A function that takes a file descriptor and returns a vector indicating
 /// which pages are in memory.
+///
+/// Note that this function does not follow symlinks, and that it is the
+/// caller's responsibility to ensure that the fd refers to a regular file.
+/// (Failing to check this will resuilt in a return value of EACCES).
 pub fn mincore_wrapper<Fd: AsFd>(fd: &Fd) -> RustixResult<Vec<bool>> {
-    let file_size = usize::try_from(fstat(fd)?.st_size).unwrap();
+    let file_stat = fstat(fd)?;
+    // Micro-optimization: check if regular file first before calling mmap
+    // If it is not a regular file, return the same errno that mmap would
+    if FileType::from_raw_mode(file_stat.st_mode) != FileType::RegularFile {
+        return Err(Errno::ACCESS);
+    }
+    let file_size = usize::try_from(file_stat.st_size).unwrap();
     let page_size = page_size();
     // Size is from mincore man page
     let vec_len = (file_size+page_size-1)/page_size;
