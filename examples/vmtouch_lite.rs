@@ -3,6 +3,7 @@ use mincore::mincore_wrapper;
 use std::env::args;
 use std::fs::File;
 
+// This example takes a filepath and uses mincore to count the number of already-mapped pages
 pub fn main() -> Result<(), String> {
     let args_vec: Vec<_> = args().collect();
     if args_vec.len() != 2 {
