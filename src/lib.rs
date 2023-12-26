@@ -1,11 +1,12 @@
-//! A library providing a safe wrapper around the `mincore` system call.
+//! A library providing a safe wrapper around the [`mincore`](https://www.man7.org/linux/man-pages/man2/mincore.2.html) system call. This library also re-exports `rustix::param::page_size` for convenience in interpreting the returned result.
 
 #![doc(html_root_url = "https://docs.rs/mincore-rs/0.1.0")]
 
 use rustix::fs::{fstat, FileType};
 use rustix::mm::{mmap, ProtFlags, MapFlags, munmap};
 use rustix::io::{Result as RustixResult, Errno};
-use rustix::param::page_size;
+
+pub use rustix::param::page_size;
 
 use libc::mincore;
 
@@ -16,8 +17,8 @@ use std::io::Error;
 /// which pages are in memory.
 ///
 /// Note that this function does not follow symlinks, and that it is the
-/// caller's responsibility to ensure that the fd refers to a regular file.
-/// (Failing to check this will resuilt in a return value of EACCES).
+/// caller's responsibility to ensure that `fd` refers to a regular file.
+/// (Failing to check this will result in a return value of EACCES).
 pub fn mincore_wrapper<Fd: AsFd>(fd: &Fd) -> RustixResult<Vec<bool>> {
     let file_stat = fstat(fd)?;
     // Micro-optimization: check if regular file first before calling mmap
